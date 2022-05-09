@@ -5,6 +5,7 @@ import SignIn from '../views/SignIn.vue'
 import Documents from '../views/DocumentsView.vue'
 import SignUp from '../views/SignUp.vue'
 
+import Admin from '../views/AdminView.vue'
 
 
 
@@ -17,6 +18,14 @@ const routes = [
     component: Test,
     meta: {
       requiresAuth: false
+    }
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin,
+    meta: {
+      requiresAuth: true
     }
   },
   {
