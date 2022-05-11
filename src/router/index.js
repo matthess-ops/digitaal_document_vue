@@ -6,12 +6,20 @@ import Documents from '../views/DocumentsView.vue'
 import SignUp from '../views/SignUp.vue'
 
 import Admin from '../views/AdminView.vue'
-
+import UserUpload from '../views/UserUpload.vue'
 
 
 Vue.use(VueRouter)
 
 const routes = [
+  {
+    path: '/user/:id',
+    name: 'UserUpload',
+    component: UserUpload,
+    meta: {
+      requiresAuth: true
+    }
+  },
   {
     path: '/',
     name: 'Test',
