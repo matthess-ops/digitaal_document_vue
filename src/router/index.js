@@ -4,9 +4,10 @@ import Test from '../views/TestView.vue'
 import SignIn from '../views/SignIn.vue'
 import Documents from '../views/DocumentsView.vue'
 import SignUp from '../views/SignUp.vue'
-
 import Admin from '../views/AdminView.vue'
 import UserUpload from '../views/UserUpload.vue'
+// import store from '../store'
+
 
 
 Vue.use(VueRouter)
@@ -34,7 +35,11 @@ const routes = [
     component: Admin,
     meta: {
       requiresAuth: true
-    }
+    },
+    // beforeEnter: (to, from,next) => {
+    //   // reject the navigation
+    //   return false
+    // },
   },
   {
     path: '/signup',
@@ -73,7 +78,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth == true && router.app.$store.state.auth.authenticated == false) {
-    next({ name: 'Documents' })
+    next({ name: 'SignUp' })
 
 
   } else {

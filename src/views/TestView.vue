@@ -1,7 +1,9 @@
 <template>
   <div class="about">
     <h1>Test view </h1>
-               <button @click="submitForm">test submit</button>
+        <button @click="submitForm">test submit</button>
+                <button @click="sendMail">send basic mail</button>
+
 
    </div>
 
@@ -23,6 +25,19 @@ export default {
   },
   computed: {},
   methods: {
+
+    sendMail(){
+      console.log("sending mail function called");
+       axios.get('/api/sendbasicemail')
+                 .then((res) => {
+                     console.log(res)
+                 })
+                 .catch((error) => {
+                     // error.response.status Check status code
+                 }).finally(() => {
+                     //Perform action in always
+                 });},
+   
  
    
         submitForm(){

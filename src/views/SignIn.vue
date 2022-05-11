@@ -13,6 +13,7 @@
         Sign in
       </button>
     </div>
+    {{this.$store.state.auth.user  }}
   </form>
 </template>
 
@@ -39,8 +40,15 @@
 
       async submit () {
         await this.signIn(this.form)
+        if(this.$store.state.auth.user.is_admin){
+                  this.$router.replace({ name: 'Admin' })
 
-        this.$router.replace({ name: 'Documents' })
+        }else{
+                  this.$router.replace({ name: 'Documents' })
+
+        }
+
+ 
       }
     }
   }

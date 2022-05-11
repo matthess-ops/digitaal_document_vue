@@ -1,40 +1,9 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@matthess-ops 
-matthess-ops
-/
-digitale_handtekening_vue
-Public
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-digitale_handtekening_vue/src/views/DocumentsView.vue
 
-matthess first commit
-Latest commit e4cbb90 3 days ago
- History
- 0 contributors
-137 lines (121 sloc)  3.57 KB
    
 <template>
   <div>
     <h1>documents overview</h1>
-    <!-- userID {{ userId }}
-    <div>
-      <h4>documents:</h4>
-      <div>{{ documents }}</div>
-    </div> -->
+    <button @click="resetPassword()">reset password</button>
 
     <button @click="downloadtxt()">DownLoad txt</button>
     <button @click="downloadpdf()">DownLoad pdf</button>
@@ -52,8 +21,7 @@ Latest commit e4cbb90 3 days ago
         <button @click="downloadWorks(document.id)">download</button>
       </div>
     </div>
-           <button @click="submitForm">test submit</button>
-
+    <button @click="submitForm">test submit</button>
   </div>
 </template>
 
@@ -61,10 +29,11 @@ Latest commit e4cbb90 3 days ago
 export default {
   data() {
     return {
-        form: {
-            firstname:'test',
-         
-        },
+      form: {
+        firstname: "test",
+        email: "hendrik@gmail.com",
+      },
+
       documents: null,
       loading: true,
       userId: this.$store.state.auth.user.id,
@@ -72,6 +41,17 @@ export default {
   },
   computed: {},
   methods: {
+    resetPassword() {
+      console.log("called reset password");
+      axios.post(`/api/resetpassword`, this.form).then((response) => {
+        if (response.status == 200) {
+          this.documents = response.data;
+        } else {
+          console.log("Error occurred " + response.data.status);
+        }
+        this.loading = false;
+      });
+    },
     huh() {
       console.log("kom op");
     },
@@ -86,18 +66,21 @@ export default {
         this.loading = false;
       });
     },
-        submitForm(){
-               console.log("submitForm called");
-               console.log(this.form);
-            axios.post('/api/test', this.form)
-                 .then((res) => {
-                     console.log(res)
-                 })
-                 .catch((error) => {
-                     // error.response.status Check status code
-                 }).finally(() => {
-                     //Perform action in always
-                 });},
+    submitForm() {
+      console.log("submitForm called");
+      console.log(this.form);
+      axios
+        .post("/api/test", this.form)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          // error.response.status Check status code
+        })
+        .finally(() => {
+          //Perform action in always
+        });
+    },
     downloadWorks(id) {
       console.log("download works function called id= ".id);
       axios
