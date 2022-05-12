@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+// import * as axioswoauth from 'axios'
 import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
@@ -15,6 +15,10 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = 'http://localhost:8000/'
 window.axios = axios;
+
+// axioswoauth.defaults.withCredentials =false
+// axioswoauth.defaults.baseURL = 'http://localhost:8000/'
+// window.axioswoauth = axioswoauth;
 
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin

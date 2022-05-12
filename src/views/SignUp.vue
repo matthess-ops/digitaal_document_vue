@@ -1,5 +1,5 @@
 <template>
-  <div class="signup">
+  <!-- <div class="signup">
     <h1>Sign up</h1>
     <form action="#" @submit.prevent="submitForm">
       <div>
@@ -43,7 +43,76 @@
       <h2>      {{ succes }}
 </h2>
     </form>
+  </div> -->
+
+  <div>
+    <form action="#" @submit.prevent="submit">
+
+ <div class="form-group">
+        <label for="lastname">Achternaam</label>
+        <input
+          v-model="form.lastname"
+          type="lastname"
+          name="lastname"
+          class="form-control"
+          id="lastname"
+          aria-describedby="lastnameHelp"
+          placeholder="Enter achternaam"
+        />
+        <small id="lastnameHelp" class="form-text text-muted"
+          >Voor hier uw achternaam in.</small
+        >
+      </div>
+
+
+       <div class="form-group">
+        <label for="firstname">Voornaam</label>
+        <input
+          v-model="form.firstname"
+          type="firstname"
+          name="firstname"
+          class="form-control"
+          id="firstname"
+          aria-describedby="firstnameHelp"
+          placeholder="Enter voornaam"
+        />
+        <small id="firstnameHelp" class="form-text text-muted"
+          >Voor hier uw voornaam in.</small
+        >
+      </div>
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input
+          v-model="form.email"
+          type="email"
+          name="email"
+          class="form-control"
+          id="email"
+          aria-describedby="emailHelp"
+          placeholder="Enter email"
+        />
+        <small id="emailHelp" class="form-text text-muted"
+          >We'll never share your email with anyone else.</small
+        >
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          v-model="form.password"
+          type="password"
+          class="form-control"
+          id="password"
+          placeholder="Password"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
   </div>
+
+
+
+  
 </template>
 
 

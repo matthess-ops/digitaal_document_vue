@@ -5,23 +5,26 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link class="nav-link" to="/">Test</router-link>
+            <router-link
+              v-bind:class="{ active: this.$route.name === 'Test' }"
+              class="nav-link"
+              to="/"
+              >Test
+            </router-link>
           </li>
           <template v-if="!authenticated">
-            <router-link class="nav-link" to="/signin">Sign in</router-link>
-            <router-link class="nav-link" to="/signup">Sign up</router-link>
+            <router-link v-bind:class="{ active: this.$route.name === 'SignIn' }"  class="nav-link" to="/signin">Sign in</router-link>
+            <router-link v-bind:class="{ active: this.$route.name === 'SignUp' }" class="nav-link" to="/signup">Sign up</router-link>
           </template>
 
           <template v-else>
             <template v-if="user.is_admin == false">
-              <router-link class="nav-link" to="/documents"
+              <router-link v-bind:class="{ active: this.$route.name === 'Documents' }" class="nav-link" to="/documents"
                 >Documents</router-link
               >
             </template>
             <template v-if="user.is_admin == true">
-              <router-link class="nav-link" to="/admin"
-                >Admin</router-link
-              >
+              <router-link v-bind:class="{ active: this.$route.name === 'Admin' }" class="nav-link" to="/admin">Admin</router-link>
             </template>
             <a class="nav-link" href="#" @click.prevent="signOut">Sign out</a>
           </template>

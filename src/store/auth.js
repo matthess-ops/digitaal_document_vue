@@ -51,8 +51,30 @@ export default {
  
 
     async signIn ({ dispatch }, credentials) {
+      console.log("huh")
       await axios.get('/sanctum/csrf-cookie')
+      
+      // .then((response)=>{
+      //   console.log("csrf-cookie response ",response.status)
+      //   console.log("csrf-cookie full response ",response)
+      // });
       await axios.post('/login', credentials)
+      
+      // .then((response)=>{
+      //   console.log("loging response ",response.status)
+      //   console.log("logging response.data ",response.data)
+      // });
+
+
+      // axios.post(`/api/resetpassword`, this.form).then((response) => {
+      //   if (response.status == 200) {
+      //     this.documents = response.data;
+      //   } else {
+      //     console.log("Error occurred " + response.data.status);
+      //   }
+      //   this.loading = false;
+      // });
+
 
       return dispatch('me')
     },
