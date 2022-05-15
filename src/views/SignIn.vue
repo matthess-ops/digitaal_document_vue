@@ -50,8 +50,13 @@
       </div>
 
       <button type="submit" class="btn btn-primary">Loging</button>
-      <button class="btn btn-primary" @click="$router.push({ name: 'ResetPassword' })">Reset Password</button>
     </form>
+    <button
+      class="btn btn-primary"
+      @click="$router.push({ name: 'ResetPassword' })"
+    >
+      Reset Password
+    </button>
   </div>
 </template>
 
@@ -90,6 +95,9 @@ export default {
     },
 
     async submit() {
+
+
+
       try {
         await this.signIn(this.form);
         this.loginError = false;

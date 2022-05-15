@@ -5,6 +5,7 @@
     <button @click="sendMail">send basic mail</button>
     <button @click="testUnprotected">unprotected</button>
     <button @click="testUnprotectedpost">unprotected post</button>
+    <button @click="removeCookie">remove cookie</button>
 
   </div>
 </template>
@@ -21,6 +22,19 @@ export default {
   },
   computed: {},
   methods: {
+
+    removeCookie(){
+      console.log("remove cokkies called")
+      document.cookie = "username=John Doe";
+document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+    // var theCookies = document.cookie.split(';');
+    // var aString = '';
+    // for (var i = 1 ; i <= theCookies.length; i++) {
+    //     aString += i + ' ' + theCookies[i-1] + "\n";
+    // }
+    // console.log(theCookies);
+    },
     testUnprotected() {
       console.log("testunprotected");
       axios

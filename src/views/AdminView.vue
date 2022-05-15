@@ -1,42 +1,114 @@
 <template>
   <div class="about">
     <h1>Admin</h1>
-    {{ users }}
-    <input @input="searchUser()" v-model="searchText" />
+    {{ nextPage }}
+    <input v-model="searchText" />
+    <button @click="searchForUser()">test submit</button>
 
     <div v-if="loading">Data is loading...</div>
     <div v-else>
       <ul id="users">
-        <li v-for="searchedUser in searchedUsers" :key="searchedUser.id">
-          {{ searchedUser.firstname }} || {{ searchedUser.lastname }}||
-          {{ searchedUser.email }}
-<button @click="$router.push({name: 'UserUpload', params: { id: searchedUser.id },})">Click to Navigate</button>
-
+        <li v-for="user in users" :key="user.id">
+          {{ user.firstname }} || {{ user.lastname }}||
+          {{ user.email }}
+          <button
+            @click="
+              $router.push({ name: 'UserUpload', params: { id: user.id } })
+            "
+          >
+            Click to Navigate
+          </button>
         </li>
       </ul>
     </div>
-    {{ searchText }}
   </div>
 </template>
 
 
 <script>
+import ResetPasswordVue from "./ResetPassword.vue";
 export default {
   data() {
     return {
-      users:[],
+      users: [],
       searchedUsers: [],
-      loading: null,
+      loading: true,
       searchText: "",
+      nextPage: "",
+      loadingNextLink: false,
     };
   },
   computed: {},
   methods: {
+    getInitialUsers() {
+      console.log("get users fucntion called");
+      axios.get(`/api/users`).then((response) => {
+        console.log(response.data);
+        if (response.data.status == "success") {
+          this.users = response.data.data.data;
+          this.nextLink = response.data.data.next_page_url;
+          // this.searchedUsers = response.data.data.data.sort((a, b) => a.firstname - b.firstname);
+          this.loading = false;
+        }
+        if (response.data.status == "unauthorized") {
+          $router.push({ name: "Documents" });
+        }
+      });
+    },
+
+    getNextUsers() {
+      window.onscroll = () => {
+        let bottomOfWindowRangeA =
+          document.documentElement.scrollTop + window.innerHeight >
+          document.documentElement.offsetHeight - 10;
+        let bottomOfWindowRangeB =
+          document.documentElement.scrollTop + window.innerHeight <
+          document.documentElement.offsetHeight + 10;
+        if (
+          bottomOfWindowRangeA &&
+          bottomOfWindowRangeB &&
+          this.loadingNextLink == false &&
+          this.nextLink != null
+        ) {
+          this.loadingNextLink = true;
+          axios.get(this.nextLink).then((response) => {
+            console.log("next user response");
+            console.log(response.data);
+            this.users = this.users.concat(response.data.data.data);
+            this.nextLink = response.data.data.next_page_url;
+            this.loadingNextLink = false;
+          });
+        }
+      };
+    },
+
+    searchForUser() {
+      console.log("search for user called");
+      console.log(this.searchText);
+
+      if (this.searchText != "") {
+        axios.get(`/api/searchuser/${this.searchText}`).then((response) => {
+          console.log(response.data);
+          if (response.data.status == "success") {
+            this.users = response.data.data;
+            this.nextLink = null
+            this.loading = false;
+          }
+          if (response.data.status == "unauthorized") {
+            $router.push({ name: "Documents" });
+          }
+        });
+      }else{
+
+        this.getInitialUsers()
+      }
+    },
+
     test() {
       console.log("dit werkt");
       console.log(this.searchText);
     },
-    getUsers() {
+    getUserss() {
       console.log("werlt dot");
       this.loading = true;
       axios.get(`/api/users`).then((response) => {
@@ -59,18 +131,20 @@ export default {
         const foundLastname = user.lastname.indexOf(this.searchText);
         const foundEmail = user.email.indexOf(this.searchText);
 
-        const combined = foundFirstname+foundLastname+foundEmail
+        const combined = foundFirstname + foundLastname + foundEmail;
 
-        if (combined != -3 ) {
+        if (combined != -3) {
           results.push(user);
         }
       });
       this.searchedUsers = results;
-
     },
   },
   beforeMount() {
-    this.getUsers();
+    this.getInitialUsers();
+  },
+  mounted() {
+    this.getNextUsers();
   },
 };
 </script>
