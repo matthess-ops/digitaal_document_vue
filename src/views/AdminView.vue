@@ -1,13 +1,52 @@
 <template>
   <div class="about">
     <h1>Admin</h1>
-    {{ nextPage }}
-    <input v-model="searchText" />
-    <button @click="searchForUser()">test submit</button>
+
+    <div class="input-group mb-3">
+      <input
+        v-model="searchText"
+        type="text"
+        class="form-control"
+        placeholder="Zoek client"
+        aria-label="Zoekj client"
+      />
+      <div class="input-group-append">
+        <button class="btn btn-primary" @click="searchForUser()">Zoek</button>
+      </div>
+    </div>
 
     <div v-if="loading">Data is loading...</div>
     <div v-else>
-      <ul id="users">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Voornaam</th>
+            <th scope="col">Achternaam</th>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, index) in users" :key="user.id" scope="row">
+            <th >{{ index }}</th>
+            <td>{{ user.firstname }}</td>
+            <td>{{ user.lastname }}</td>
+            <td>{{ user.email }}</td>
+            <td>            <button class="btn btn-primary"
+            @click="
+              $router.push({ name: 'UserUpload', params: { id: user.id } })
+            "
+          >
+            Documenten
+          </button></td>
+
+      
+          </tr>
+          
+        </tbody>
+      </table>
+
+      <!-- <ul id="users">
         <li v-for="user in users" :key="user.id">
           {{ user.firstname }} || {{ user.lastname }}||
           {{ user.email }}
@@ -19,7 +58,7 @@
             Click to Navigate
           </button>
         </li>
-      </ul>
+      </ul> -->
     </div>
   </div>
 </template>
@@ -91,16 +130,15 @@ export default {
           console.log(response.data);
           if (response.data.status == "success") {
             this.users = response.data.data;
-            this.nextLink = null
+            this.nextLink = null;
             this.loading = false;
           }
           if (response.data.status == "unauthorized") {
             $router.push({ name: "Documents" });
           }
         });
-      }else{
-
-        this.getInitialUsers()
+      } else {
+        this.getInitialUsers();
       }
     },
 

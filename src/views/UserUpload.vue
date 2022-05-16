@@ -1,6 +1,31 @@
 <template>
   <div class="container">
-    {{userId}}
+    <h3>Downloads</h3>
+<span>{{ 3600000 | duration('humanize') }}</span>
+ <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Db id</th>
+            <th scope="col">created at</th>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(document, index) in documents" :key="document.id" scope="row">
+            <th >{{ index }}</th>
+            <td>{{ document.id }}</td>
+            <td>{{ document.created_at }}</td>
+            <td>{{ document.updated_at }}</td>
+      
+          </tr>
+          
+        </tbody>
+      </table>
+
+
+
+    {{ documents }}
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card">
@@ -27,9 +52,25 @@ export default {
       file: "",
       success: "",
       userId:this.$route.params.id,
+      documents:[],
     };
   },
   methods: {
+
+    getUserDocuments() {
+      this.loading = true;
+      axios.get(`/api/documents/${this.userId}`).then((response) => {
+        if (response.status == 200) {
+          this.documents = response.data;
+        } else {
+          console.log("Error occurred " + response.data.status);
+        }
+        this.loading = false;
+      });
+    },
+
+
+
     onChange(e) {
       this.file = e.target.files[0];
     },
@@ -57,6 +98,10 @@ export default {
   },
   mounted() {
     console.log("user id  ",this.userId)
+  },
+  beforeMount(){
+    this.getUserDocuments()
+    console.log(this.documents)
   },
 };
 </script>
