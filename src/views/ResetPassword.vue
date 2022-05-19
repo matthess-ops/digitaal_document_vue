@@ -11,14 +11,12 @@
           id="email"
           aria-describedby="emailHelp"
           placeholder="Enter email"
-          v-bind:class="{ 'is-invalid': status === 'failed', 'is-valid': status === 'success'}"
+          v-bind:class="{ 'is-invalid': status === 'failed'}"
         />
         <div v-if="status === 'failed'" class="text-danger">
           {{ message }}
         </div>
-         <div v-if="status === 'success'" class="text-success">
-          {{ message }}
-        </div>
+    
       </div>
       <button type="submit" class="btn btn-primary">Send</button>
     </form>
@@ -52,14 +50,13 @@ export default {
     async signOut() {
       await this.signOutAction();
 
-      this.$router.replace({ name: "SignIn" });
+      this.$router.replace({ name: "SignInView" });
     },
 
 
     submit() {
       console.log("called reset password");
       axios.post(`/api/resetpassword`, this.form).then((response) => {
-        console.log("email is ", response.data);
         this.status = response.data.status;
         this.message = response.data.message;
         this.signOut()

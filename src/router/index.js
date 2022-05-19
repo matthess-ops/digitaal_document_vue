@@ -1,11 +1,12 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Test from "../views/TestView.vue";
-import SignIn from "../views/SignIn.vue";
-import Documents from "../views/DocumentsView.vue";
-import SignUp from "../views/SignUp.vue";
-import Admin from "../views/AdminView.vue";
-import UserUpload from "../views/UserUpload.vue";
+// import Test from "../views/TestView.vue";
+import SignInView from "../views/SignInView.vue";
+import UserDocumentsView from "../views/UserDocumentsView.vue";
+import SignUpView from "../views/SignUpView.vue";
+import AdminUsersView from "../views/AdminUsersView.vue";
+import AdminUserDocumentsView from "../views/AdminUserDocumentsView.vue";
+import AdminUserSigningView from "../views/AdminUserSigningView.vue";
 import ResetPassword from "../views/ResetPassword.vue";
 
 import store from "../store";
@@ -14,9 +15,17 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/user/:id",
-    name: "UserUpload",
-    component: UserUpload,
+    path: "/admin-user-documents/:id",
+    name: "AdminUserDocumentsView",
+    component: AdminUserDocumentsView,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/admin-user-signing/:userid/:documentid/:filename",
+    name: "AdminUserSigningView",
+    component: AdminUserSigningView,
     meta: {
       requiresAuth: true,
     },
@@ -29,63 +38,61 @@ const routes = [
       requiresAuth: false,
     },
   },
+  // {
+  //   path: "/",
+  //   name: "Test",
+  //   component: Test,
+  //   meta: {
+  //     requiresAuth: false,
+  //   },
+  // },
   {
-    path: "/",
-    name: "Test",
-    component: Test,
-    meta: {
-      requiresAuth: false,
-    },
-  },
-  {
-    path: "/admin",
-    name: "Admin",
-    component: Admin,
+    path: "/admin-users-view",
+    name: "AdminUsersView",
+    component: AdminUsersView,
     meta: {
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      console.log("check if admin then continue to admin")
       if (store.state.auth.user.is_admin != null) {
         if (store.state.auth.user.is_admin) {
           next();
         } else {
-          next({ name: "Documents" });
+          next({ name: "UserDocumentsView" });
         }
       }
     },
   },
   {
     path: "/signup",
-    name: "SignUp",
-    component: SignUp,
+    name: "SignUpView",
+    component: SignUpView,
     meta: {
       requiresAuth: false,
     },
   },
   {
     path: "/signin",
-    name: "SignIn",
-    component: SignIn,
+    name: "SignInView",
+    component: SignInView,
     meta: {
       requiresAuth: false,
     },
   },
   {
-    path: "/documents",
-    name: "Documents",
-    component: Documents,
+    path: "/user-documents",
+    name: "UserDocumentsView",
+    component: UserDocumentsView,
     meta: {
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      console.log("check if user then continue to documents")
 
       if (store.state.auth.user.is_admin != null) {
         if (store.state.auth.user.is_admin == false) {
           next();
         } else {
-          next({ name: "Admin" });
+          next({ name: "AdminUsersView" });
         }
       }
     },
@@ -104,7 +111,7 @@ router.beforeEach((to, from, next) => {
     to.meta.requiresAuth == true &&
     router.app.$store.state.auth.authenticated == false
   ) {
-    next({ name: "SignIn" });
+    next({ name: "SignInView" });
   } else {
     next();
   }

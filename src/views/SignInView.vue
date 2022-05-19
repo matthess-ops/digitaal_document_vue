@@ -1,25 +1,8 @@
 <template>
-  <div>
-    <!-- <form action="#" @submit.prevent="submit">
-    <div>
-      <label for="email">Email address</label>
-      <input type="text" name="email" id="email" v-model="form.email">
-    </div>
-    <div>
-      <label for="password">Password</label>
-      <input type="text" name="password" id="password" v-model="form.password">
-    </div>
-    <div>
-      <button type="submit">
-        Sign in
-      </button>
-    </div>
-    {{this.$store.state.auth.user  }}
-  </form> -->
-
+  <div class="container max-width: 70% !important">
     <form action="#" @submit.prevent="submit">
       <div class="form-group">
-        <label for="email">Email address</label>
+        <label for="email">Email adres</label>
         <input
           v-model="form.email"
           type="email"
@@ -31,32 +14,36 @@
           v-bind:class="{ 'is-invalid': loginError === true }"
         />
         <div v-if="loginError === true" class="text-danger">
-          Email/Username is incorrect
+          Email/wachtwoord combinatie is niet bekend.
         </div>
       </div>
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">Wachtwoord</label>
         <input
           v-model="form.password"
           type="password"
           class="form-control"
           id="password"
-          placeholder="Password"
+          placeholder="Wachtwoord"
           v-bind:class="{ 'is-invalid': loginError === true }"
         />
         <div v-if="loginError === true" class="text-danger">
-          Email/Username is incorrect
+          Email/wachtwoord combinatie is niet bekend.
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary">Loging</button>
+      <!-- <button type="submit" class="btn btn-primary">Log in</button> -->
     </form>
+    <div class="mt-2">
+    <button class=" btn btn-primary " @click="login()">Log in</button>
+
     <button
-      class="btn btn-primary"
+      class=" ms-2 btn btn-primary"
       @click="$router.push({ name: 'ResetPassword' })"
     >
-      Reset Password
+      Reset Wachtwoord
     </button>
+    </div>
   </div>
 </template>
 
@@ -94,24 +81,21 @@ export default {
       });
     },
 
-    async submit() {
-
-
-
+    async login() {
       try {
         await this.signIn(this.form);
         this.loginError = false;
-
         if (this.$store.state.auth.user.is_admin) {
-          this.$router.replace({ name: "Admin" });
+          this.$router.replace({ name: "AdminUsersView" });
         } else {
-          this.$router.replace({ name: "Documents" });
+          this.$router.replace({ name: "UserDocumentsView" });
         }
       } catch (error) {
-        console.log("error while logging in wrong user/password");
         this.loginError = true;
       }
     },
+
+  
   },
 };
 </script>
