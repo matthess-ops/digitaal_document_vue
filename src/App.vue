@@ -37,6 +37,17 @@
                 :to="{ name: 'UserDocumentsView' }"
                 >Documenten</router-link
               >
+
+                <router-link
+                v-bind:class="{
+                  active: this.$route.name === 'UserSignedDocumentsView',
+                }"
+                class="nav-link"
+                :to="{ name: 'UserSignedDocumentsView' }"
+                >Ondertekenen</router-link
+              >
+
+              <!-- UserSignedDocumentsView -->
             </template>
             <template v-if="user.is_admin == true">
               <router-link
@@ -47,7 +58,16 @@
                 :to="{ name: 'AdminUsersView' }"
                 >Admin</router-link
               >
+                 <router-link
+                v-bind:class="{
+                  active: this.$route.name === 'AdminSignedStatusView',
+                }"
+                class="nav-link"
+                :to="{ name: 'AdminSignedStatusView' }"
+                >Signed status</router-link
+              >
             </template>
+
             <a class="nav-link" href="#" @click.prevent="signOut">Sign out</a>
           </template>
         </ul>

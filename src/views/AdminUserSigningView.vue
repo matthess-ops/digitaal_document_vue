@@ -1,13 +1,12 @@
 <template>
   <div>
     <h3>Maak digitale handtekening voor file aan voor</h3>
-    {{ admin }}
     <div>{{ user.firstname }} {{ user.lastname }}</div>
     <div>
       {{ user.email }}
     </div>
     <div class="mt-3 mb-3">filename: {{ filename }}</div>
-    {{ admin }}
+    {{ errors }}
     <div>
       <div class="form-group">
         <label for="sendTo">Email ontvanger</label>
@@ -18,14 +17,16 @@
           class="form-control"
           id="sendTo"
           placeholder="Email Ontvanger"
-          v-bind:class="{ 'is-invalid': errors.send_to != null }"
+          v-bind:class="{ 'is-invalid': errors.sendTo != null }"
         />
       </div>
+      <div v-if="errors.sendTo != null" class="text-danger">
+        {{ errors.sendTo[0] }}
+      </div>
 
-       <div class="form-group">
+      <div class="form-group">
         <label for="text">Uitleggende tekst client</label>
         <textarea
-        
           v-model="form.text"
           rows="3"
           type="text"
@@ -36,8 +37,13 @@
           v-bind:class="{ 'is-invalid': errors.text != null }"
         />
       </div>
-          <button class="btn btn-primary" @click="sendSignRequest()">Verzenden</button>
+      <div v-if="errors.text != null" class="text-danger">
+        {{ errors.text[0] }}
+      </div>
 
+      <button class="btn btn-primary" @click="sendSignRequest()">
+        Verzenden
+      </button>
     </div>
   </div>
 </template>
@@ -55,9 +61,9 @@ export default {
       form: {
         userId: this.$route.params.userid,
         documentId: this.$route.params.documentid,
-        sendTo: "",
-        applicant: "",
-        text: "",
+        sendTo: "test@hotmail.com",
+        applicant: "sini",
+        text: "ik wil dit document naar sini sturen",
       },
       errors: [],
     };
@@ -73,12 +79,35 @@ export default {
 
   methods: {
 
-sendSignRequest(){
+//     test(){
+//  axios
+//         .get(`/api/testdb`)
+//         .then((response) => {
+//           console.log(response)
+       
+//         });
+//     },
 
 
-},
 
 
+    sendSignRequest() {
+      axios.post("/api/createsigning", this.form).then((response) => {
+        console.log(response);
+        if (response.status === 200) {
+          if (response.data.status == "success") {
+            // router link to sign in doen hier
+            // this.$router.push({ name: 'AdminUsersView' })
+          }
+          if (response.data.status == "failed") {
+            console.log("form errros found");
+            this.errors = response.data.errors;
+          }
+        } else {
+          console.log("server error ", response.status);
+        }
+      });
+    },
 
     getUserDocument() {
       axios
@@ -93,8 +122,7 @@ sendSignRequest(){
               this.admin = response.data.admin;
               this.form.applicant =
                 this.admin.firstname + " " + this.admin.lastname;
-                //admin is eigenlijk niet eens nodig.
-            
+              //admin is eigenlijk niet eens nodig.
             }
           } else {
             console.log("Error occurred");

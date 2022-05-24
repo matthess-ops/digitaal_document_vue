@@ -8,12 +8,22 @@ import AdminUsersView from "../views/AdminUsersView.vue";
 import AdminUserDocumentsView from "../views/AdminUserDocumentsView.vue";
 import AdminUserSigningView from "../views/AdminUserSigningView.vue";
 import ResetPassword from "../views/ResetPassword.vue";
+import AdminSignedStatusView from "../views/AdminSignedStatusView.vue";
+import UserSignedDocumentsView from "../views/UserSignedDocumentsView.vue";
 
 import store from "../store";
 
 Vue.use(VueRouter);
 
 const routes = [
+  {
+    path: "/user-signed-documents",
+    name: "UserSignedDocumentsView",
+    component: UserSignedDocumentsView,
+    meta: {
+      requiresAuth: true,
+    },
+  },
   {
     path: "/admin-user-documents/:id",
     name: "AdminUserDocumentsView",
@@ -46,6 +56,23 @@ const routes = [
   //     requiresAuth: false,
   //   },
   // },
+  {
+    path: "/admin-signed-status-view",
+    name: "AdminSignedStatusView",
+    component: AdminSignedStatusView,
+    meta: {
+      requiresAuth: true,
+    },
+    beforeEnter: (to, from, next) => {
+      if (store.state.auth.user.is_admin != null) {
+        if (store.state.auth.user.is_admin) {
+          next();
+        } else {
+          next({ name: "UserDocumentsView" });
+        }
+      }
+    },
+  },
   {
     path: "/admin-users-view",
     name: "AdminUsersView",
