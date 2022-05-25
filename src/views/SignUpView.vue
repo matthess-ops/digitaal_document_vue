@@ -4,7 +4,7 @@
 
 <template>
   <div class="container">
-    <!-- <form action="#" @submit.prevent="submit"> -->
+    <!-- sign up form, do not change to <form> because is resulted in weird behaviour-->
     <div class="form-group">
       <label for="firstname">Voornaam</label>
       <input
@@ -70,51 +70,60 @@
       {{ errors.password[0] }}
     </div>
     <button class="btn btn-primary" @click="signUpForm()">Aanmaken</button>
-    {{ errors }}
   </div>
 </template>
 
 
 <script>
 import axios from "axios";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
     return {
       form: {
         firstname: "",
-        lastname: "nieuw",
-        email: "nieuw@gmail.com",
-        password: "password",
+        lastname: "",
+        email: "",
+        password: "",
       },
       errors: {},
-      succes: undefined,
     };
   },
 
   methods: {
+    // import vuex signout action
+    ...mapActions({
+      signOutAction: "auth/signOut",
+    }),
+
+    async signOut() {
+      await this.signOutAction();
+
+      this.$router.replace({ name: "SignInView" });
+    },
+    // sign up function
+    // after an successfull signup log-out then redirect to login page
+    // log-out is needed because the sanctum api key needs to be reset if any previous users used the same browser page
     signUpForm() {
       this.errors = {};
-      console.log("signUpForm called");
-      console.log(this.form);
-      axios
-        .post("/api/signup", this.form)
-        .then((response) => {
-          console.log(response);
-          console.log(response.status);
-          if (response.status === 200) {
-            if (response.data.status == "success") {
-              // router link to sign in doen hier
-              this.$router.push({ name: 'SignInView' })
-            }
-            if (response.data.status == "failed") {
-              console.log("form errros found");
-              this.errors = response.data.errors;
-            }
-          } else {
-            console.log("server error ", response.status);
+
+      axios.post("/api/signup", this.form).then((response) => {
+        if (response.status === 200) {
+          if (response.data.status == "success") {
+            this.signOut();
+
+            // router link to sign in doen hier
+            this.$router.push({ name: "SignInView" });
           }
-        })
+          if (response.data.status == "failed") {
+            console.log("form errros found");
+            this.errors = response.data.errors;
+          }
+        } else {
+          console.log("server error ", response.status);
+        }
+      });
     },
   },
 };
@@ -122,8 +131,6 @@ export default {
 
 
 <style scoped>
-
-
 /* Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {
 }
@@ -135,9 +142,7 @@ export default {
 }
 /* Large devices (desktops, 992px and up) */
 @media (min-width: 992px) {
-  h1 {
-    color: red;
-  }
+ 
   .container {
     max-width: 50%;
   }
@@ -145,9 +150,7 @@ export default {
 
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
-  h1 {
-    color: green;
-  }
+ 
   .container {
     max-width: 50%;
   }

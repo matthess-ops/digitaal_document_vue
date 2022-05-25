@@ -14,6 +14,8 @@ import UserSignedDocumentsView from "../views/UserSignedDocumentsView.vue";
 import store from "../store";
 
 Vue.use(VueRouter);
+// kan to,from niet verwijderen uit beforeEnter: (to, from, next) ivm errors
+
 
 const routes = [
   {
@@ -23,6 +25,16 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
+    beforeEnter: (to, from, next) => {
+
+      if (store.state.auth.user.is_admin != null) {
+        if (store.state.auth.user.is_admin == false) {
+          next();
+        } else {
+          next({ name: "AdminUsersView" });
+        }
+      }
+    },
   },
   {
     path: "/admin-user-documents/:id",
@@ -30,6 +42,15 @@ const routes = [
     component: AdminUserDocumentsView,
     meta: {
       requiresAuth: true,
+    },
+    beforeEnter: (to, from, next) => {
+      if (store.state.auth.user.is_admin != null) {
+        if (store.state.auth.user.is_admin) {
+          next();
+        } else {
+          next({ name: "UserDocumentsView" });
+        }
+      }
     },
   },
   {
@@ -39,6 +60,16 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
+    beforeEnter: (to, from, next) => {
+      if (store.state.auth.user.is_admin != null) {
+        if (store.state.auth.user.is_admin) {
+          next();
+        } else {
+          next({ name: "UserDocumentsView" });
+        }
+      }
+    },
+  
   },
   {
     path: "reset-password",
@@ -48,14 +79,7 @@ const routes = [
       requiresAuth: false,
     },
   },
-  // {
-  //   path: "/",
-  //   name: "Test",
-  //   component: Test,
-  //   meta: {
-  //     requiresAuth: false,
-  //   },
-  // },
+
   {
     path: "/admin-signed-status-view",
     name: "AdminSignedStatusView",

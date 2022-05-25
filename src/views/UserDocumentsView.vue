@@ -3,7 +3,7 @@
 <template>
   <div class="container">
     <h3>Documenten</h3>
-    <div v-if="documents.length >0">
+    <div v-if="documents.length > 0">
       <table class="table">
         <thead>
           <tr>
@@ -53,34 +53,29 @@ export default {
   },
   computed: {},
   methods: {
+    // humanize elapsed type
     calculateDuration(date) {
       let duration = moment.duration(moment().diff(moment(date)));
       return duration.humanize();
     },
-
+    // get all user documents
     getUserDocuments() {
-      console.log("getuser documents called");
       this.loading = true;
       axios.get(`/api/userdocuments`).then((response) => {
         if (response.status == 200) {
-          console.log(response)
-          this.documents = response.data.reverse();
+          console.log(response);
+          this.documents = response.data.reverse(); // reverse document so that they newest is on top
         } else {
           console.log("Error occurred " + response.data.status);
         }
         this.loading = false;
       });
     },
-
-        downloadFile(id, filename) {
-      console.log("download works function called id= ".id);
+    //download file
+    downloadFile(id, filename) {
       axios
         .get(`/api/download/${id}`, { responseType: "blob" })
         .then((response) => {
-          console.log(response);
-          console.log(response.data.type);
-          console.log("filename is  ", filename);
-
           let blob = new Blob([response.data], { type: response.data.type });
           let link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
@@ -88,13 +83,10 @@ export default {
           link.click();
         });
     },
-
-   
   },
   beforeMount() {
     this.getUserDocuments();
   },
-  mounted() {},
-  created() {},
+
 };
 </script>

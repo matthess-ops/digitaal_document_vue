@@ -1,4 +1,10 @@
+
+
 <template>
+  <!-- big problem in the code is to show the current signing status of the document. 
+        it is implemented in a not elegant matter. Best fix would be to implement a new boolean data field on the document object, for example "signing_requested"
+        that gets flipped once the admin send a signing request to the user. -->
+
   <div class="container">
     <div v-if="user.lenght != {}">
       <div class="mb-3 mt-3">
@@ -11,6 +17,8 @@
         <div class="row">
           <div class="col-md-8">
             <div class="card">
+              <!-- document upload code -->
+
               <div class="card-header">Upload een document</div>
               <div class="card-body">
                 <div v-if="success != ''" class="alert alert-success">
@@ -33,6 +41,8 @@
       </div>
 
       <div>
+        <!-- documents table -->
+
         <div v-if="documents.length > 0">
           <table class="table">
             <thead>
@@ -41,6 +51,8 @@
                 <th scope="col">Db id</th>
                 <th scope="col">Updated at</th>
                 <th scope="col">Filename</th>
+                <th scope="col">document id</th>
+                <th scope="col">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -52,7 +64,12 @@
                 <th>{{ index }}</th>
                 <td>{{ document.id }}</td>
                 <td>{{ calculateDuration(document.updated_at) }}</td>
+                <!-- humanized updated_at -->
+
                 <td>{{ document.filename }}</td>
+                <td>{{ document.id }}</td>
+                <td>{{ getStatus(document.id) }}</td>
+
                 <td>
                   <button
                     class="btn btn-primary"
@@ -69,12 +86,19 @@
                     delete
                   </button>
                 </td>
-                        <td>
+                <td>
                   <button
                     class="btn btn-primary"
-                     @click="
-              $router.push({ name: 'AdminUserSigningView', params: { userid: user.id, filename:document.filename, documentid:document.id } })
-            "
+                    @click="
+                      $router.push({
+                        name: 'AdminUserSigningView',
+                        params: {
+                          userid: user.id,
+                          filename: document.filename,
+                          documentid: document.id,
+                        },
+                      })
+                    "
                   >
                     Sign
                   </button>
@@ -99,67 +123,68 @@ import * as moment from "moment/moment";
 export default {
   data() {
     return {
-      name: "",
+      // name: "",
       file: "",
       success: "",
       userId: this.$route.params.id,
       documents: [],
       user: {},
       userNotFound: null,
+      signedDocuments: [],
     };
   },
   methods: {
+    // checks if an document has an signed document. If so change the state of the document to the signed document status. See the top of this file for more information.
+    getStatus(documentId) {
+      let state = "niet aangevraagd"; // since not every document has a signed document an default not requested to be signed var is needed
+      this.signedDocuments.forEach((signedDocument) => {
+        if (signedDocument.document_id == String(documentId)) {
+          // needed a type change since documentId was an int
+          state = signedDocument.signed_status;
+        }
+      });
+      return state;
+    },
+    //humanize the input date
     calculateDuration(date) {
-      let duration = moment.duration(moment().diff(moment(date)));
+      const duration = moment.duration(moment().diff(moment(date)));
       return duration.humanize();
     },
 
+    // this removes an document from the document folder. If the document has a to be signed document in the signedDocument folder this is not deleted.
     destroyFile(id) {
-      console.log("download works function called id= ",id);
       axios.delete(`/api/document/${id}`).then((response) => {
-        console.log("response is")
-        console.log(response)
         if (response.status == 200) {
-          console.log("delte file with id ", id);
-          console.log(this.documents.length);
           this.documents = this.documents.filter(function (document) {
             return document.id != id;
-          });
-          console.log(this.documents.length);
-
-          console.log(response);
-        }else{
-          console.log("error")
+          }); // remove the removed document from this.document state.
+        } else {
+          console.log("error");
         }
       });
     },
-
+    // download functions.
     downloadFile(id, filename) {
-      console.log("download works function called id= ".id);
       axios
         .get(`/api/download/${id}`, { responseType: "blob" })
         .then((response) => {
-          console.log(response);
-          console.log(response.data.type);
-          console.log("filename is  ", filename);
-
-          let blob = new Blob([response.data], { type: response.data.type });
-          let link = document.createElement("a");
+          const blob = new Blob([response.data], { type: response.data.type });
+          const link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
           link.download = filename;
           link.click();
         });
     },
 
+    // the request returns 3 data, user data, user documents data and user signed documents data
     getUserDocuments() {
-      console.log("dit moet werke");
       this.loading = true;
       axios.get(`/api/adminuserdocuments/${this.userId}`).then((response) => {
         if (response.status == 200) {
           console.log(response);
           if (response.data.status === "success") {
-            console.log("ik heb data");
             this.documents = response.data.documents.reverse();
+            this.signedDocuments = response.data.signatures;
             this.user = response.data.user;
           }
         } else {
@@ -173,6 +198,7 @@ export default {
       this.file = e.target.files[0];
     },
 
+    // document upload function
     uploadFile() {
       const config = {
         headers: {
@@ -186,46 +212,10 @@ export default {
 
       axios.post("api/upload", data, config).then((response) => {
         this.documents.push(response.data.data);
-        this.documents = this.documents.reverse();
-        console.log(this.animals);
+        this.documents = this.documents.reverse(); // update dom
       });
     },
-
-    // formSubmit(e) {
-    //   e.preventDefault();
-    //   let existingObj = this;
-    //   const config = {
-    //     headers: {
-    //       "content-type": "multipart/form-data",
-    //     },
-    //   };
-    //   let data = new FormData();
-    //   data.append("file", this.file);
-    //   data.append("userId", this.userId);
-
-    //   axios
-    //     .post("api/upload", data, config)
-    //     .then(function (res) {
-    //       console.log("add sizzle");
-    //       existingObj.success = res.data.success;
-    //       const testadd = {
-    //         id: 111111,
-    //         created_at: "2022-05-17T10:19:38.000000Z",
-    //         updated_at: "2022-05-17T10:19:38.000000Z",
-    //         user_id: "95",
-    //         filepath:
-    //           "storage\\app\\public\\documents/1652782778_epoxytestprint.gcode",
-    //         filename: "1652782778_epoxytestprint.gcode",
-    //       };
-    //       this.documents.push(testadd);
-    //       console.log("heef gerwerkt");
-    //     })
-    //     .catch(function (err) {
-    //       existingObj.output = err;
-    //     });
-    // },
   },
-  mounted() {},
   beforeMount() {
     this.getUserDocuments();
   },

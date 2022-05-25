@@ -1,5 +1,6 @@
 <template>
-  <div class="resetPassword">
+  <div>
+    <!-- reset password form -->
     <form action="#" @submit.prevent="submit">
       <div class="form-group">
         <label for="email">Email address</label>
@@ -11,12 +12,11 @@
           id="email"
           aria-describedby="emailHelp"
           placeholder="Enter email"
-          v-bind:class="{ 'is-invalid': status === 'failed'}"
+          v-bind:class="{ 'is-invalid': status === 'failed' }"
         />
         <div v-if="status === 'failed'" class="text-danger">
           {{ message }}
         </div>
-    
       </div>
       <button type="submit" class="btn btn-primary">Send</button>
     </form>
@@ -29,38 +29,39 @@ export default {
   data() {
     return {
       form: {
-        email: "matthijn@gmail.com",
+        email: "",
       },
       message: "",
       status: "",
     };
   },
-    computed: {
+  computed: {
     ...mapGetters({
       authenticated: "auth/authenticated",
       user: "auth/user",
     }),
   },
   methods: {
-
+    // import vuex signout action
     ...mapActions({
       signOutAction: "auth/signOut",
     }),
-
+    // sign out function. After resetting password this function is called
+    // to sign the user out and is then directed to the sign in view. Signing out
+    // is needed because else the password reset wont work
     async signOut() {
       await this.signOutAction();
 
       this.$router.replace({ name: "SignInView" });
     },
 
-
     submit() {
-      console.log("called reset password");
       axios.post(`/api/resetpassword`, this.form).then((response) => {
         this.status = response.data.status;
         this.message = response.data.message;
-        this.signOut()
-
+        if (this.status == "success") { //only sign out when the reset password email link is send
+          this.signOut();
+        }
       });
     },
   },

@@ -4,6 +4,7 @@
 
     <div v-if="loading">Data is loading...</div>
     <div v-else>
+      <!-- signed document status buttons -->
       <div>
         <button
           v-bind:class="{ 'btn-success': signedStatus === 'open' }"
@@ -27,7 +28,8 @@
           Afgewezen
         </button>
       </div>
-      <div v-if="filteredSignedDocuments != []">
+            <div v-if="filteredSignedDocuments.length >0">
+
         <table class="table table-hover">
           <thead>
             <tr>
@@ -77,12 +79,28 @@
                   Akkoord
                 </button>
               </td>
+
+               <td>
+                <!-- {{ download button of the documents }} -->
+
+                <button
+                  class="btn btn-primary"
+                  @click="
+                    downloadSignedFile(
+                      filteredSignedDocument.id,
+                      filteredSignedDocument.filename
+                    )
+                  "
+                >
+                  download
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div v-else>
-        <h3>Geen clienten/gebruikers gevonden</h3>
+        <h3>Geen documenten gevonden</h3>
       </div>
     </div>
   </div>
@@ -94,27 +112,43 @@ import * as moment from "moment/moment";
 export default {
   data() {
     return {
-      signedDocuments: [],
-      filteredSignedDocuments: [],
+      signedDocuments: [], // all signed documents belonging to user
+      filteredSignedDocuments: [], //
       loading: true,
       signedStatus: "open",
     };
   },
   computed: {},
   methods: {
+
+// download the file of interest
+  downloadSignedFile(id, filename) {
+      axios
+        .get(`/api/downloadsigned/${id}`, { responseType: "blob" })
+        .then((response) => {
+        
+          const blob = new Blob([response.data], { type: response.data.type });
+          const link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = filename;
+          link.click();
+        });
+    },
+
+
+
+
+    // update the state of signed document
+    //newStatus = open,not_agreed, signed
+    // id= is document id
     updateState(newStatus, id) {
         const data = {id:id,newStatus:newStatus}
       axios.post(`/api/changestatus`, data).then((response) => {
         if (response.status == 200) {
             console.log(response)
             if(response.data.status == "success"){
-                alert("Ondertekenen is goed gegaan");
-                this.getSignedDocuments();
-        //           this.signedDocuments = this.signedDocuments .filter(function (document) {
-        //     return document.id != response.data.data;
-        //   });
-        //     this.filteredSignedDocuments = this.signedDocuments
-        //     this.filterDocuments(this.signedStatus)
+                this.getSignedDocuments(); // retrieving all signed documents again. Next time just concat the new document to signedDocument array 
+     
             }else{
 
                 alert("Er is iets fout gegaan. Probeer opnieuwe te ondertekenen");
@@ -126,9 +160,9 @@ export default {
         this.loading = false;
       });
     },
-
+    // filter the documents according to status button input
+    // open,not_agreed, signed
     filterDocuments(status) {
-      console.log("filter documents called");
 
       var filtered = this.signedDocuments.filter(
         (signedDocument) => signedDocument.signed_status == status
@@ -137,25 +171,25 @@ export default {
       this.signedStatus = status;
     },
 
-    sortOrder() {
-      const openStatus = this.signedDocuments.filter(
-        (signedDocument) => signedDocument.signed_status == "open"
-      );
-      const notAgreedStatus = this.signedDocuments.filter(
-        (signedDocument) => signedDocument.signed_status == "not_agreed"
-      );
-      const signedStatus = this.signedDocuments.filter(
-        (signedDocument) => signedDocument.signed_status == "signed"
-      );
-      this.filteredSignedDocuments = openStatus;
-    },
-
+    // sortOrder() {
+    //   const openStatus = this.signedDocuments.filter(
+    //     (signedDocument) => signedDocument.signed_status == "open"
+    //   );
+    //   const notAgreedStatus = this.signedDocuments.filter(
+    //     (signedDocument) => signedDocument.signed_status == "not_agreed"
+    //   );
+    //   const signedStatus = this.signedDocuments.filter(
+    //     (signedDocument) => signedDocument.signed_status == "signed"
+    //   );
+    //   this.filteredSignedDocuments = openStatus;
+    // },
+      // humanize elapsed time
     calculateDuration(date) {
       let duration = moment.duration(moment().diff(moment(date)));
       return duration.humanize();
     },
+    // get all signed documents op user
     getSignedDocuments() {
-      console.log("getSignedDocuments() called");
       this.loading = true;
       axios.get(`/api/usersigneddocuments`).then((response) => {
         if (response.status == 200) {
@@ -164,7 +198,7 @@ export default {
             console.log("dit moet gecalled worden");
             this.signedDocuments = response.data.data;
             this.filteredSignedDocuments = this.signedDocuments;
-            this.filterDocuments(this.signedStatus)
+            this.filterDocuments(this.signedStatus) // show the current column after server fetch
           }
         } else {
           console.log("Error occurred");

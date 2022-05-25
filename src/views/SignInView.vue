@@ -1,5 +1,6 @@
 <template>
-  <div class="container max-width: 70% !important">
+  <div class="container">
+    <!-- signup form -->
     <form action="#" @submit.prevent="submit">
       <div class="form-group">
         <label for="email">Email adres</label>
@@ -32,11 +33,10 @@
         </div>
       </div>
 
-      <!-- <button type="submit" class="btn btn-primary">Log in</button> -->
     </form>
     <div class="mt-2">
     <button class=" btn btn-primary " @click="login()">Log in</button>
-
+    <!-- reset password button -->
     <button
       class=" ms-2 btn btn-primary"
       @click="$router.push({ name: 'ResetPassword' })"
@@ -65,32 +65,35 @@ export default {
   },
 
   methods: {
+    //vuex sign in function
     ...mapActions({
       signIn: "auth/signIn",
     }),
 
-    resetPassword() {
-      console.log("called reset password");
-      axios.post(`/api/resetpassword`, this.form).then((response) => {
-        if (response.status == 200) {
-          this.documents = response.data;
-        } else {
-          console.log("Error occurred " + response.data.status);
-        }
-        this.loading = false;
-      });
-    },
+    // resetPassword() {
+    //   axios.post(`/api/resetpassword`, this.form).then((response) => {
+    //     if (response.status == 200) {
+    //       this.documents = response.data;
+    //     } else {
+    //       console.log("Error occurred " + response.data.status);
+    //     }
+    //     this.loading = false;
+    //   });
+    // },
 
+    // login function
+    // if login is a failure because email or password combo is incorrect show the user an error
+    // then check if the user is an admin or a user an redirect them to their correspondig main pages.
     async login() {
       try {
         await this.signIn(this.form);
         this.loginError = false;
         if (this.$store.state.auth.user.is_admin) {
-          this.$router.replace({ name: "AdminUsersView" });
+          this.$router.replace({ name: "AdminUsersView" }); // admin redirect
         } else {
-          this.$router.replace({ name: "UserDocumentsView" });
+          this.$router.replace({ name: "UserDocumentsView" }); // user redirect
         }
-      } catch (error) {
+      } catch (error) { // email password combo not found 
         this.loginError = true;
       }
     },
@@ -99,3 +102,32 @@ export default {
   },
 };
 </script>
+
+
+
+<style scoped>
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+}
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .container {
+    max-width: 50%;
+  }
+}
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+
+  .container {
+    max-width: 50%;
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+
+  .container {
+    max-width: 50%;
+  }
+}
+</style>

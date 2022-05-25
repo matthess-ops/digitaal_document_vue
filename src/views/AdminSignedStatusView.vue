@@ -1,7 +1,7 @@
 <template>
-  <div class="about">
-    <h1>Signing overview</h1>
-    <!-- {{ signedDocuments[0].user.firstname }} -->
+  <div>
+    <h1>Ondertekening overzicht</h1>
+    <!-- {{ Search the to be signed documenten input }} -->
     <div class="input-group mb-3">
       <input
         v-model="searchText"
@@ -15,7 +15,14 @@
       </div>
     </div>
     <div>
-  
+      
+    <!-- {{ 3 buttons that filter the signed documenten depending on their status. The status are
+    open, signed, not_agreed
+    open = the document needs user input
+    signed = the user signed the document
+    not_agreed = the user doesnt want to sign the document }} -->
+    <!-- make an component of these buttons -->
+
       <button
         v-bind:class="{ 'btn-success': signedStatus === 'open' }"
         class="btn btn-primary"
@@ -38,6 +45,7 @@
         Afgewezen
       </button>
     </div>
+    <!-- {{ documents table }} -->
 
     <div v-if="loading">Data is loading...</div>
     <div v-else>
@@ -66,20 +74,28 @@
               <td>{{ filteredSignedDocument.filename }}</td>
               <td>{{ filteredSignedDocument.send_to }}</td>
               <td>{{ filteredSignedDocument.signed_status }}</td>
+              <td>
+                <!-- {{ download button of the documents }} -->
 
-              <!-- <td>            <button class="btn btn-primary"
-            @click="
-              $router.push({ name: 'AdminUserDocumentsView', params: { id: user.id } })
-            "
-          >
-            Documenten
-          </button></td> -->
+                <button
+                  class="btn btn-primary"
+                  @click="
+                    downloadSignedFile(
+                      filteredSignedDocument.id,
+                      filteredSignedDocument.filename
+                    )
+                  "
+                >
+                  download
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div v-else>
-        <h3>Geen clienten/gebruikers gevonden</h3>
+
+        <h3>No documents found</h3>
       </div>
     </div>
   </div>
@@ -90,18 +106,31 @@ export default {
   data() {
     return {
       loading: true,
-      signedDocuments: [],
-      filteredSignedDocuments: [],
+      signedDocuments: [], // all signed documents
+      filteredSignedDocuments: [], // the filtered documents, these are filterd by the search input or the 3 buttons input
       loading: true,
-      searchText: "mat",
-      signedStatus: "open",
+      searchText: "",
+      signedStatus: "open", // open, not_agreed, signed, searched, have choosen open as default. This var is used in highlighting their corresponding filter buttons
     };
   },
   computed: {},
   methods: {
+    // download the signed document.
+    downloadSignedFile(id, filename) {
+      axios
+        .get(`/api/downloadsigned/${id}`, { responseType: "blob" })
+        .then((response) => {
+        
+          const blob = new Blob([response.data], { type: response.data.type });
+          const link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = filename;
+          link.click();
+        });
+    },
+    // search the signed documents for user firstname.
+
     searchDocuments() {
-      console.log("search documents");
-      console.log(this.searchText);
       if (this.searchText != "") {
         let filtered = [];
         this.signedDocuments.forEach((signedDocument) => {
@@ -110,34 +139,32 @@ export default {
           }
         });
         this.filteredSignedDocuments = filtered;
-        this.signedStatus = "searched"
+        this.signedStatus = "searched"; // change the status to searched this should deactivate the highlightin of the three buttons
       } else {
-        this.filterDocuments("open");
+        this.filterDocuments("open"); // if there is not search string reload all documents with status open
       }
     },
+    // filter fuction status (open, not_agreed signed) of documents
     filterDocuments(status) {
-      console.log("filter documents called");
 
-      var filtered = this.signedDocuments.filter(
+      const filtered = this.signedDocuments.filter(
         (signedDocument) => signedDocument.signed_status == status
       );
       this.filteredSignedDocuments = filtered;
       this.signedStatus = status;
     },
-
+    // get the raw signed documente from server
     getSignedDocuments() {
-      console.log("getSignedDocuments() called");
       this.loading = true;
       axios.get(`/api/adminsigneddocuments`).then((response) => {
         if (response.status == 200) {
           console.log(response);
           if (response.data.status === "success") {
-            console.log("dit moet gecalled worden");
             this.signedDocuments = response.data.data;
-            this.filteredSignedDocuments = this.signedDocuments;
-            // this.filterDocuments('open')
+            this.filterDocuments(this.signedStatus); // filter document for default signed status
           }
         } else {
+          // do something with the failed status
           console.log("Error occurred");
         }
         this.loading = false;

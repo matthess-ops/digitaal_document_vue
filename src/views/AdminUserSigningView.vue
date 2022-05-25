@@ -6,7 +6,6 @@
       {{ user.email }}
     </div>
     <div class="mt-3 mb-3">filename: {{ filename }}</div>
-    {{ errors }}
     <div>
       <div class="form-group">
         <label for="sendTo">Email ontvanger</label>
@@ -61,46 +60,27 @@ export default {
       form: {
         userId: this.$route.params.userid,
         documentId: this.$route.params.documentid,
-        sendTo: "test@hotmail.com",
-        applicant: "sini",
-        text: "ik wil dit document naar sini sturen",
+        sendTo: "",
+        text: "",
       },
       errors: [],
     };
   },
 
-  //  $table->string('user_id');
-  // $table->string('filepath');
-  // $table->string('filename');
-  // $table->string('signed_status'); // signed, open, not_agreed
-  // $table->string('send_to');
-  // $table->string('applicant');
-  // $table->string('text');
+
 
   methods: {
-
-//     test(){
-//  axios
-//         .get(`/api/testdb`)
-//         .then((response) => {
-//           console.log(response)
-       
-//         });
-//     },
-
-
-
-
+    // create siging request for a document
     sendSignRequest() {
       axios.post("/api/createsigning", this.form).then((response) => {
         console.log(response);
         if (response.status === 200) {
           if (response.data.status == "success") {
-            // router link to sign in doen hier
-            // this.$router.push({ name: 'AdminUsersView' })
+        
+            this.$router.push({ name: 'AdminUserDocumentsView', params: { id: this.userId } })
+            // after making a sign request for a user redirect to page.
           }
-          if (response.data.status == "failed") {
-            console.log("form errros found");
+          if (response.data.status == "failed") { //form errors
             this.errors = response.data.errors;
           }
         } else {
@@ -108,21 +88,18 @@ export default {
         }
       });
     },
-
+    //function that gets document, user, admin data
     getUserDocument() {
       axios
         .get(`/api/getuserDocument/${this.userId}/${this.documentId}`)
         .then((response) => {
           if (response.status == 200) {
-            console.log(response);
             if (response.data.status === "success") {
-              console.log("ik heb data");
               this.document = response.data.document;
               this.user = response.data.user;
               this.admin = response.data.admin;
               this.form.applicant =
                 this.admin.firstname + " " + this.admin.lastname;
-              //admin is eigenlijk niet eens nodig.
             }
           } else {
             console.log("Error occurred");
