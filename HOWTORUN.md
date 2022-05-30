@@ -1,2 +1,3 @@
+- this the front end of the digitale handtekening project. The laravel backend can be found here. https://github.com/matthess-ops/digitaal_handtekening_laravel. See HOWTORUN.md for more information.
 - npm install
 -npm run serve -> default should be localhost:8080. If not set this localhost:8080 or change in .env in laravel backend the SANCTUM_STATEFUL_DOMAINS to the localhost the frontend is running.

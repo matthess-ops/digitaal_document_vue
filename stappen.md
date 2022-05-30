@@ -1,4 +1,4 @@
-1: make model and migration
+1: make model and migrdation
 
 php artisan make:model 
 Product -m
