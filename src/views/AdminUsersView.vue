@@ -2,23 +2,24 @@
   <div>
     <h1>User docs</h1>
     <!-- search input -->
-    {{ nextLink }}
+    <!-- {{ users }} -->
     <div class="input-group mb-3">
       <input
+      v-on:keyup.enter="searchForUser()"
         v-model="searchText"
         type="text"
         class="form-control"
         placeholder="Zoek client"
         aria-label="Zoek client"
       />
-      <div class="input-group-append">
-        <button class="btn btn-primary" @click="searchForUser()">Zoek</button>
-      </div>
+      <!-- <div class="input-group-append"> -->
+        <button class="btn btn-primary ms-2" @click="searchForUser()">Zoek</button>
+      <!-- </div> -->
     </div>
 
     <div v-if="loading">Data is loading...</div>
     <div v-else>
-      <div v-if="users != []">
+      <div v-if="users.length !=0">
         <table class="table table-hover">
           <thead>
             <tr>

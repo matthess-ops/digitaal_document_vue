@@ -4,6 +4,7 @@
     <!-- {{ Search the to be signed documenten input }} -->
     <div class="input-group mb-3">
       <input
+        v-on:keyup.enter="searchDocuments()"
         v-model="searchText"
         type="text"
         class="form-control"
